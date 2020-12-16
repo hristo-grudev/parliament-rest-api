@@ -1,3 +1,5 @@
+import itertools
+
 from django.db import models
 
 
@@ -14,6 +16,21 @@ class Names(models.Model):
     date = models.IntegerField()
     place = models.ForeignKey(Places, on_delete=models.DO_NOTHING)
     email = models.TextField(max_length=50)
+
+    def get_lang(self):
+        lang = LanguagesToNames.objects.select_related('language')\
+                                        .filter(name_id=self)
+        return lang
+
+    def get_prof(self):
+        prof = ProfessionsToNames.objects.select_related('profession')\
+                                        .filter(name_id=self)
+        return prof
+
+    def get_party(self):
+        party = PartiesToNames.objects.select_related('party')\
+                                        .filter(name_id=self)
+        return party
 
     def __str__(self):
         return self.name
@@ -42,16 +59,15 @@ class Languages(models.Model):
 
 class LanguagesToNames(models.Model):
     name = models.ForeignKey(Names, on_delete=models.DO_NOTHING)
-    language = models.ManyToManyField(Languages)
+    language = models.ForeignKey(Languages, related_name='lang', on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return self.name
-
+        return str(self.language)
 
 
 class PartiesToNames(models.Model):
     name = models.ForeignKey(Names, on_delete=models.DO_NOTHING)
-    party = models.ManyToManyField(Parties)
+    party = models.ForeignKey(Parties, related_name='part', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.name
@@ -59,7 +75,7 @@ class PartiesToNames(models.Model):
 
 class ProfessionsToNames(models.Model):
     name = models.ForeignKey(Names, on_delete=models.DO_NOTHING)
-    profession = models.ManyToManyField(Professions)
+    profession = models.ForeignKey(Professions, related_name='prof', on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return self.name
+        return self.profession
