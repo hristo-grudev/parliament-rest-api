@@ -10,6 +10,9 @@ class Places(models.Model):
     def __str__(self):
         return self.town + ', ' + self.country
 
+    class Meta:
+        ordering = ('town',)
+
 
 class Names(models.Model):
     name = models.TextField(max_length=100)
